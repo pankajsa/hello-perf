@@ -12,9 +12,14 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Configuration {
+	static private Logger logger = LoggerFactory.getLogger(Configuration.class);
+
 	private static Options options = optionsBuilder();
+	private static HashMap<String, String> hmap = new HashMap<String,String>();
 
     public static void Usage() {
     	System.err.println("Usage:");
@@ -35,69 +40,85 @@ public class Configuration {
    		     .numberOfArgs(1)
    		     .build());
     	options.addOption(Option.builder("u")
-      		     .required(true)
+      		     .required(false)
       		     .desc("username")
       		     .longOpt("username")
       		     .numberOfArgs(1)
       		     .build());
     	options.addOption(Option.builder("p")
-      		     .required(true)
+      		     .required(false)
       		     .desc("password")
       		     .longOpt("password")
       		     .numberOfArgs(1)
       		     .build());
-    	options.addOption(Option.builder("n")
-      		     .required(true)
-      		     .desc("port number")
-      		     .longOpt("port")
-      		     .numberOfArgs(1)
-      		     .build());
-    	options.addOption(Option.builder("w")
+    	options.addOption(Option.builder("o")
      		     .required(true)
-     		     .desc("publish ack window")
-     		     .longOpt("pubackwindow")
+     		     .desc("publishCount")
+     		     .longOpt("publishCount")
      		     .numberOfArgs(1)
      		     .build());
     	options.addOption(Option.builder("v")
-     		     .required(false)
-     		     .desc("verbose")
-     		     .longOpt("verbose")
-     		     .numberOfArgs(0)
+     		     .required(true)
+     		     .desc("vpn name")
+     		     .longOpt("vpn")
+     		     .numberOfArgs(1)
      		     .build());
+    	options.addOption(Option.builder("j")
+    		     .required(true)
+    		     .desc("publishTopic")
+    		     .longOpt("publishTopic")
+    		     .numberOfArgs(1)
+    		     .build());
+//    	options.addOption(Option.builder("w")
+//     		     .required(true)
+//     		     .desc("publish ack window")
+//     		     .longOpt("pubackwindow")
+//     		     .numberOfArgs(1)
+//     		     .build());
+//    	options.addOption(Option.builder("v")
+//     		     .required(false)
+//     		     .desc("verbose")
+//     		     .longOpt("verbose")
+//     		     .numberOfArgs(0)
+//     		     .build());
     	return(options);
     	
     }
     
-    private static void updateArgument(String key, HashMap<String, String> hmap, CommandLine cmd) {
-    	if (cmd.hasOption("hostname"))
-    		hmap.put("hostname", cmd.getOptionValue("hostname"));
-    	System.out.println(hmap);
+    private static void updateArgument(String key, CommandLine cmd) {
+    	if (cmd.hasOption(key))
+    		hmap.put(key, cmd.getOptionValue(key));
     }
     
-    public static HashMap<String, String> getArguments(String[] args) { 
-    	HashMap<String, String> hmap = new HashMap<String,String>();
-    	hmap.put("hostname", "localhost");
-    	hmap.put("port", "55555");
+    public static HashMap<String, String> setupDefaults(String[] args) { 
+//    	hmap.put("hostname", "localhost");
+//    	hmap.put("port", "55555");
     	
     	CommandLineParser parser = new DefaultParser();
     	CommandLine cmd;
 		try {
 			cmd = parser.parse( options, args);
-	    	hmap.put("password", cmd.getOptionValue("password"));
-	    	updateArgument("hostname", hmap, cmd);
-	    	updateArgument("username", hmap, cmd);
+	    	updateArgument("publishCount", cmd);
+	    	updateArgument("hostname", cmd);
+	    	updateArgument("publishTopic", cmd);
+	    	
+	    	updateArgument("username", cmd);
+	    	updateArgument("password", cmd);
+	    	updateArgument("vpn", cmd);
+	    	updateArgument("port", cmd);
 	    	return(hmap);
 		} catch (ParseException e) {
-    		System.err.println("Error in command line arguments. " + e.getMessage());
+    		logger.error("Error in command line arguments. " + e.getMessage());
     		Usage();
     		System.exit(1);
-
 		}
 		throw new RuntimeException("Unknown Error");
     	
+    }
 
-    	
+    public static HashMap<String, String> getDefaults() { 
+    	return hmap;
     	
     }
-    
+
 }

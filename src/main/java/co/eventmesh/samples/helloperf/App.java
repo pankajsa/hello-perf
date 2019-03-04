@@ -3,19 +3,47 @@
  */
 package co.eventmesh.samples.helloperf;
 
-import java.util.HashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.solacesystems.jcsmp.JCSMPException;
+import com.solacesystems.jcsmp.XMLMessageProducer;
+
 
 public class App {
+	static private Logger logger = LoggerFactory.getLogger(App.class);
+
     public String getGreeting() {
         return "Hello world.";
     }
 
     
     public static void main(String[] args) throws Exception {
-    	System.out.println("0:" + args[0] + "1:" + args[1] + "2:" + args[2]);
+    	logger.info("App Starting");
+    	Configuration.setupDefaults(args);
+    	startPublishing();
     	
-    	HashMap<String, String> parsedArgs = Configuration.getArguments(args);    		
-        System.out.println("ParsedArgs = " + parsedArgs);
+    	
+//    	new Thread(new PublishThread(5, "Hello World"), "publish-thread").start();
+//    	System.out.println("0:" + args[0] + "1:" + args[1] + "2:" + args[2]);
+//    	
+//    	HashMap<String, String> parsedArgs = Configuration.getArguments(args);    		
+//        System.out.println("ParsedArgs = " + parsedArgs);
+//        SimpleThreadPool.main(args);
+    }
+    
+    
+    public static void startPublishing() throws JCSMPException {
+    	int repeatCount = Integer.parseInt(Configuration.getDefaults().get("publishCount"));
+    	String publishTopic = Configuration.getDefaults().get("publishTopic");
+
+    	PublishThread publishThread = new PublishThread(publishTopic, repeatCount, "Hello World....");
+    	PublishEventHandler handler = new PublishEventHandler();
+    	XMLMessageProducer prod = SolacePublisherFactory.getProducer(handler);
+    	publishThread.setProducerListener(prod, handler);
+    	
+    	new Thread(publishThread, "publish-thread").start();    	
     }
     
     
