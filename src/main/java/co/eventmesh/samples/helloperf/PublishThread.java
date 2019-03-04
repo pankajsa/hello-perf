@@ -64,9 +64,9 @@ public class PublishThread implements Runnable {
 //    	logger.info(this.toString() + " - Started");
         logger.info(Thread.currentThread().getName()+" - Started.");
 
-    	Stopwatch watch = new Stopwatch();
+    	Stopwatch watch = new Stopwatch("Publish " + this.repeatCount + " messages");
         processCommand();
-    	logger.info("Processing Time:" + watch);
+    	logger.info("Processing Time:" + watch.toString());
         logger.info(Thread.currentThread().getName()+" - Terminated.");
 //    	logger.info(this.toString() + " - Terminated");
 
