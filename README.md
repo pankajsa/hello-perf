@@ -6,18 +6,19 @@ Test client generates random data and publishes it to the queue.
 Clone the repository and use gradle to build and run it
 The program uses command line arguments
 
-usage: App
+````usage: App
  -h,--hostname <arg>       host FQDN
  -j,--publishTopic <arg>   publishTopic
  -o,--publishCount <arg>   publishCount
  -p,--password <arg>       password
  -u,--username <arg>       username
  -v,--vpn <arg>            vpn name
- 
+ ````
  
  Sample command line
+ ````
  gradle run --args="-h='192.168.1.55:55555' -u=testuser -p=solace123 -v=testvpn -publishCount=20000 -publishTopic=a/b"
- 
+ ````
  [hello-perf ]$ gradle run --args="-h='192.168.1.55:55555' -u=testuser -p=solace123 -v=testvpn -publishCount=20000 -publishTopic=a/b"
 
 > Task :run
