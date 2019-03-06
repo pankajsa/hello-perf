@@ -17,9 +17,9 @@ The program uses command line arguments
  
  Sample command line
  ````
- gradle run --args="-h='192.168.1.55:55555' -u=testuser -p=solace123 -v=testvpn -publishCount=20000 -publishTopic=a/b"
+ ./gradlew run --args="-h='192.168.1.55:55555' -u=testuser -p=solace123 -v=testvpn -publishCount=20000 -publishTopic=a/b"
  ````
- [hello-perf ]$ gradle run --args="-h='192.168.1.55:55555' -u=testuser -p=solace123 -v=testvpn -publishCount=20000 -publishTopic=a/b"
+ [hello-perf ]$ ./gradlew run --args="-h='192.168.1.55:55555' -u=testuser -p=solace123 -v=testvpn -publishCount=20000 -publishTopic=a/b"
 
 > Task :run
 01:31:32 INFO  c.e.s.h.App(23) - App Starting [main]
