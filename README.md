@@ -3,7 +3,7 @@ High performance client that consumes messages from a queue and publishes to a t
 Test client generates random data and publishes it to the queue.
 
 # How to run the client
-Clone the repository and use gradle to build and run it
+Clone the repository and use gradle to build and run it.
 The program uses command line arguments
 
 ````usage: App
