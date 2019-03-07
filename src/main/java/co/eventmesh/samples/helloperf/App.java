@@ -4,6 +4,8 @@
 package co.eventmesh.samples.helloperf;
 
 
+import java.util.Arrays;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +23,11 @@ public class App {
     
     public static void main(String[] args) throws Exception {
     	logger.info("App Starting");
+//    	logger.info(createString(1024));
     	Configuration.setupDefaults(args);
-    	startPublishing();
+    	
+        startPublishing();    		
+    	
     	
     	
 //    	new Thread(new PublishThread(5, "Hello World"), "publish-thread").start();
@@ -33,17 +38,53 @@ public class App {
 //        SimpleThreadPool.main(args);
     }
     
+    public static String createString(int stringLength){
+        
+        //create char array of specified length
+        char[] charArray = new char[stringLength];
+        char ch = 'A';
+
+        
+        //fill all elements with the specified char
+        Arrays.fill(charArray, ch);
+        
+        //create string from char array and return
+        return new String(charArray);
+    }
     
     public static void startPublishing() throws JCSMPException {
+    	int threadCount = 2;
+    	int messagesize = 4;
+    	
+    	if (Configuration.getDefaults().get("threadcount") != null) {
+    		threadCount = Integer.parseInt(Configuration.getDefaults().get("threadcount"));    		
+    	}
+    	
+
+    	if (Configuration.getDefaults().get("messagesize") != null) {
+    		messagesize = Integer.parseInt(Configuration.getDefaults().get("messagesize"));    		
+    	}
+
+    	for (int i = 0; i < threadCount; i++) {
+
+    		startPublishingThread(i, messagesize);    		
+    	}
+
+    	
+    }
+    
+    
+    public static void startPublishingThread(int threadNo, int messageSize) throws JCSMPException {
     	int repeatCount = Integer.parseInt(Configuration.getDefaults().get("publishCount"));
     	String publishTopic = Configuration.getDefaults().get("publishTopic");
+    	String messageStr = createString(messageSize);
 
-    	PublishThread publishThread = new PublishThread(publishTopic, repeatCount, "Hello World....");
+    	PublishThread publishThread = new PublishThread(publishTopic, repeatCount, messageStr);
     	PublishEventHandler handler = new PublishEventHandler();
     	XMLMessageProducer prod = SolacePublisherFactory.getProducer(handler);
     	publishThread.setProducerListener(prod, handler);
     	
-    	new Thread(publishThread, "publish-thread").start();    	
+    	new Thread(publishThread, "publish-thread-" + threadNo).start();    	
     }
     
     

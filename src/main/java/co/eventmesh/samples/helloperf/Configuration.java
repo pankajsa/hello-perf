@@ -69,6 +69,26 @@ public class Configuration {
     		     .longOpt("publishTopic")
     		     .numberOfArgs(1)
     		     .build());
+    	options.addOption(Option.builder("t")
+      		     .required(false)
+      		     .desc("thread count")
+      		     .longOpt("threadcount")
+      		     .numberOfArgs(1)
+      		     .build());
+    	options.addOption(Option.builder("z")
+     		     .required(false)
+     		     .desc("message size")
+     		     .longOpt("messagesize")
+     		     .numberOfArgs(1)
+     		     .build());
+    	options.addOption(Option.builder("h")
+      		     .required(false)
+      		     .desc("host FQDN")
+      		     .longOpt("hostname")
+      		     .numberOfArgs(1)
+      		     .build());
+
+    	
 //    	options.addOption(Option.builder("w")
 //     		     .required(true)
 //     		     .desc("publish ack window")
@@ -106,6 +126,10 @@ public class Configuration {
 	    	updateArgument("password", cmd);
 	    	updateArgument("vpn", cmd);
 	    	updateArgument("port", cmd);
+
+	    	updateArgument("threadcount", cmd);
+	    	updateArgument("messagesize", cmd);
+
 	    	return(hmap);
 		} catch (ParseException e) {
     		logger.error("Error in command line arguments. " + e.getMessage());
