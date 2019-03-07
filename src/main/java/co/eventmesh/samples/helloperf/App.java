@@ -54,7 +54,7 @@ public class App {
     
     public static void startPublishing() throws JCSMPException {
     	int threadCount = 2;
-    	int messagesize = 4;
+    	int messagesize = 1024;
     	
     	if (Configuration.getDefaults().get("threadcount") != null) {
     		threadCount = Integer.parseInt(Configuration.getDefaults().get("threadcount"));    		
