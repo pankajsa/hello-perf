@@ -19,9 +19,7 @@ import com.solacesystems.jcsmp.TextMessage;
 import com.solacesystems.jcsmp.Topic;
 import com.solacesystems.jcsmp.XMLMessageProducer;
 
-public class ConsumeThread 
-//implements Runnable 
-{
+public class ConsumeThread {
 	static private Logger logger = LoggerFactory.getLogger(ConsumeThread.class);
 	
 	private String queueName;
@@ -50,46 +48,7 @@ public class ConsumeThread
         this.publishTopicName= publishTopicName;
     }
     
-    
-    
-//    @Override
-//    public void run() {
-//        logger.info(Thread.currentThread().getName()+" - Started.");
-//        try {
-//            logger.info(Thread.currentThread().getName()+" - No waiting to proceeed.");
-//        	
-//			startSignal.await();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//
-//    	Stopwatch watch = new Stopwatch("Consume messages");
-//        processCommand();
-//    	logger.info("Processing Time:" + watch.toString());
-//        logger.info(Thread.currentThread().getName()+" - Terminated.");
-//
-//    }
-//
-//    
-//    
-//    private void processCommand() {
-//    	try {
-//    		logger.info("Thread processing about to wait");
-//    		synchronized (this.semaphore) {
-//        		this.semaphore.wait();
-//        		logger.info("Wait finished");
-//
-//    		}
-//    	}catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//    	return;
-//    
-//    
-//    }
-
-
-    
+     
     
     @Override
     public String toString(){
@@ -108,10 +67,9 @@ public class ConsumeThread
     	endpoint_props.setAccessType(EndpointProperties.ACCESSTYPE_NONEXCLUSIVE);
 
     	Context defaultContext = JCSMPFactory.onlyInstance().getDefaultContext();
-    	logger.info("DefaultContext: " + defaultContext );
+//    	logger.info("DefaultContext: " + defaultContext );
     	Context context = JCSMPFactory.onlyInstance().createContext(null);
     	JCSMPSession session = JCSMPFactory.onlyInstance().createSession(SolaceConsumerFactory.getProperties(), context);
-	   	System.out.println("Listener setup......");
     	FlowReceiver cons = session.createFlow(handler, flow_prop, endpoint_props);  
 //    	logger.info(Thread.currentThread().getName()+" - No waiting to proceeed.");
 //		this.startSignal.await();

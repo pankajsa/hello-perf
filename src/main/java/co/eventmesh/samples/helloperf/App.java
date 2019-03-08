@@ -31,23 +31,29 @@ public class App {
     		publishCount = Integer.parseInt(Configuration.getDefaults().get("publishcount"));
     	}
 
+    	int threadCount = Configuration.THREAD_COUNT;    	
+    	if (Configuration.getDefaults().get("threadcount") != null) {
+    		threadCount = Integer.parseInt(Configuration.getDefaults().get("threadcount"));    		
+    	}
+
+    	
+    	
     	
     	CountDownLatch startSignal = new CountDownLatch(1);
     	
     	
     	
-        CountDownLatch doneSignal = new CountDownLatch(publishCount);
+        CountDownLatch doneSignal = new CountDownLatch(publishCount*threadCount);
     	
-    	
-    	//    	logger.info(createString(1024));
     	
     	if (Configuration.getDefaults().get("consume") != null) {
     		startConsuming(startSignal, doneSignal);
     	}
+    	Stopwatch watch = new Stopwatch("Messages Consumed:");
+    	
     	if (Configuration.getDefaults().get("publish") != null) {
     		startPublishing(startSignal, doneSignal);    		
     	}
-    	
     	
     	
     	
@@ -58,6 +64,8 @@ public class App {
 //        System.out.println("ParsedArgs = " + parsedArgs);
 //        SimpleThreadPool.main(args);
     	doneSignal.await();
+    	logger.info(watch.toString());
+
     	Thread.sleep(5000);
     }
     

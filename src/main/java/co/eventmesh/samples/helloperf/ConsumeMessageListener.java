@@ -16,11 +16,15 @@ public class ConsumeMessageListener implements XMLMessageListener {
 	int messageCount = 0;
 	private int threadNo;
 	private CountDownLatch doneSignal;
+	private PublishThread2 pt2;
 	
 	ConsumeMessageListener(int threadNo, CountDownLatch doneSignal){
 		super();
 		this.threadNo = threadNo;
 		this.doneSignal = doneSignal;
+		pt2 = new PublishThread2("a/d");
+    	new Thread(pt2, "publish2-thread-").start();    	
+		
 	}
 	
 	
@@ -29,7 +33,6 @@ public class ConsumeMessageListener implements XMLMessageListener {
     	messageCount++;
         totalCount ++;			
 //        logger.info(messageCount + " messages received. Listener: " + threadNo + " Total Count:" + totalCount);
-        doneSignal.countDown();
         
 
 //        if (msg instanceof TextMessage) {
@@ -45,7 +48,10 @@ public class ConsumeMessageListener implements XMLMessageListener {
         // When the ack mode is set to SUPPORTED_MESSAGE_ACK_CLIENT,
         // guaranteed delivery messages are acknowledged after
         // processing
+        pt2.addMessage("BBBBBB"  + totalCount);
         msg.ackMessage();
+        doneSignal.countDown();
+
     }
 
     @Override
