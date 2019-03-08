@@ -38,7 +38,19 @@ public class PublishThread2 implements Runnable {
     	this.topicName = topicName;
     	this.topic = JCSMPFactory.onlyInstance().createTopic(topicName);
     	
+
+    	int publishcount = 1;
+    	int consthreadcount = 1;
+    	int threadcount = 1;
     	
+    	if (Configuration.getDefaults().get("publishcount") != null) 
+    		publishcount = Integer.parseInt(Configuration.getDefaults().get("publishcount"));
+    	if (Configuration.getDefaults().get("consthreadcount") != null) 
+    		consthreadcount = Integer.parseInt(Configuration.getDefaults().get("consthreadcount"));
+    	if (Configuration.getDefaults().get("threadcount") != null) 
+    		threadcount = Integer.parseInt(Configuration.getDefaults().get("threadcount"));
+    	repeatCount = publishcount * threadcount / consthreadcount;
+    	logger.debug("Loops: " +  repeatCount);
     	
 //    	int repeatCount = Configuration.PUBLISH_COUNT;
 //    	if (Configuration.getDefaults().get("publishcount") != null) {
@@ -88,8 +100,9 @@ public class PublishThread2 implements Runnable {
     	
     	
         try {
+//        	logger.info("MQueue = " + mqueue.size());
 			msg.setText(mqueue.take());
-	        msg.setDeliveryMode(DeliveryMode.PERSISTENT);
+	        msg.setDeliveryMode(DeliveryMode.DIRECT);
 	        prod.send(msg, topic);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
