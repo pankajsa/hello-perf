@@ -21,7 +21,7 @@ public class PublishThread implements Runnable {
     private int repeatCount = 0;
     private XMLMessageProducer prod = null;
 	private JCSMPStreamingPublishEventHandler handler;
-	private TextMessage msg;
+	private TextMessage msg = JCSMPFactory.onlyInstance().createMessage(TextMessage.class);
 
 	private Topic topic;
 
@@ -31,6 +31,7 @@ public class PublishThread implements Runnable {
     	this.topicName = topicName;
         this.repeatCount= repeatCount;
         this.messageText = messageText;
+    	this.topic = JCSMPFactory.onlyInstance().createTopic(topicName);
     }
     
     public void setProducerListener(XMLMessageProducer prod, JCSMPStreamingPublishEventHandler handler) {
@@ -40,21 +41,11 @@ public class PublishThread implements Runnable {
     }
 
     
-    private void send() throws JCSMPException {
-    	if (msg == null) {
-        	this.msg = JCSMPFactory.onlyInstance().createMessage(TextMessage.class);    		
-    	}
-    	if (topic == null) {
-    		topic = JCSMPFactory.onlyInstance().createTopic(topicName);
-    	}
+    private void sendMessage() throws JCSMPException {
     	msg.reset();
         msg.setText(this.messageText);
         msg.setDeliveryMode(DeliveryMode.PERSISTENT);
-//        logger.info("Connected. About to send message " + this.messageText + " to topic " + topic);
-		//        System.out.printf("Connected. About to send message '%s' to topic '%s'...%n", text, topic);
-//        logger.info(msg.toString());
         prod.send(msg, topic);
-//        System.out.printf("Connected. ----- to send message '%s' to topic '%s'...%n", text, msg.getMessageId());
     }
 
     
@@ -75,7 +66,7 @@ public class PublishThread implements Runnable {
     private void processCommand() {
     	try {
     		while(this.repeatCount-- > 0)
-    			send();
+    			sendMessage();
 		} catch (JCSMPException e) {
 			e.printStackTrace();
 		}
