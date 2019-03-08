@@ -20,6 +20,12 @@ public class Configuration {
 
 	private static Options options = optionsBuilder();
 	private static HashMap<String, String> hmap = new HashMap<String,String>();
+	
+	public static final int PUBLISH_COUNT = 1;
+	public static final int THREAD_COUNT = 1;
+	public static final int MESSAGE_SIZE = 1;
+	public static final int CONSUMER_THREAD_COUNT = 2;
+	
 
     public static void Usage() {
     	System.err.println("Usage:");
@@ -53,8 +59,8 @@ public class Configuration {
       		     .build());
     	options.addOption(Option.builder("o")
      		     .required(true)
-     		     .desc("publishCount")
-     		     .longOpt("publishCount")
+     		     .desc("publishcount")
+     		     .longOpt("publishcount")
      		     .numberOfArgs(1)
      		     .build());
     	options.addOption(Option.builder("v")
@@ -65,8 +71,8 @@ public class Configuration {
      		     .build());
     	options.addOption(Option.builder("j")
     		     .required(true)
-    		     .desc("publishTopic")
-    		     .longOpt("publishTopic")
+    		     .desc("publish topic")
+    		     .longOpt("publishtopic")
     		     .numberOfArgs(1)
     		     .build());
     	options.addOption(Option.builder("t")
@@ -87,7 +93,40 @@ public class Configuration {
       		     .longOpt("hostname")
       		     .numberOfArgs(1)
       		     .build());
+    	options.addOption(Option.builder("i")
+     		     .required(true)
+     		     .desc("Consumer Thread Count")
+     		     .longOpt("consthreadcount")
+     		     .numberOfArgs(1)
+     		     .build());
+    	options.addOption(Option.builder("aa")
+     		     .required(true)
+     		     .desc("consumequeuename")
+     		     .longOpt("consumequeuename")
+     		     .numberOfArgs(1)
+     		     .build());
+    	options.addOption(Option.builder("bb")
+    		     .required(true)
+    		     .desc("publishouttopic")
+    		     .longOpt("publishouttopic")
+    		     .numberOfArgs(1)
+    		     .build());
+    	options.addOption(Option.builder("cc")
+   		     .required(false)
+   		     .desc("consume")
+   		     .longOpt("consume")
+   		     .numberOfArgs(0)
+   		     .build());
+    	options.addOption(Option.builder("pp")
+      		     .required(false)
+      		     .desc("publish")
+      		     .longOpt("publish")
+      		     .numberOfArgs(0)
+      		     .build());
 
+
+    	
+    	
     	
 //    	options.addOption(Option.builder("w")
 //     		     .required(true)
@@ -106,8 +145,11 @@ public class Configuration {
     }
     
     private static void updateArgument(String key, CommandLine cmd) {
-    	if (cmd.hasOption(key))
-    		hmap.put(key, cmd.getOptionValue(key));
+    	String val = null;
+    	if (cmd.hasOption(key)) {
+    		val = cmd.getOptionValue(key) != null ? cmd.getOptionValue(key):"1";
+    	}
+    	hmap.put(key, val);
     }
     
     public static HashMap<String, String> setupDefaults(String[] args) { 
@@ -118,9 +160,9 @@ public class Configuration {
     	CommandLine cmd;
 		try {
 			cmd = parser.parse( options, args);
-	    	updateArgument("publishCount", cmd);
+	    	updateArgument("publishcount", cmd);
 	    	updateArgument("hostname", cmd);
-	    	updateArgument("publishTopic", cmd);
+	    	updateArgument("publishtopic", cmd);
 	    	
 	    	updateArgument("username", cmd);
 	    	updateArgument("password", cmd);
@@ -130,6 +172,14 @@ public class Configuration {
 	    	updateArgument("threadcount", cmd);
 	    	updateArgument("messagesize", cmd);
 
+	    	updateArgument("consumequeuename", cmd);
+	    	updateArgument("publishouttopic", cmd);
+	    	updateArgument("consthreadcount", cmd);
+	    	
+	    	updateArgument("consume", cmd);
+	    	updateArgument("publish", cmd);
+
+	    	
 	    	return(hmap);
 		} catch (ParseException e) {
     		logger.error("Error in command line arguments. " + e.getMessage());
