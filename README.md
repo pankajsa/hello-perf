@@ -1,6 +1,7 @@
 # hello-perf
-High performance client that consumes messages from a queue and publishes to a topic.
-Test client generates random data and publishes it to the queue.
+High performance client that can be used as a skeleton to create the Microservices. It produces a series of messages and publishes to a topic, consumes the same from a persistent queue, and then sends the response to another topic. 
+
+The number of messages, message size and the steps in the pipeline (publish/consume/respond) are configurable. By default the three steps run in the same JVM, but it can be started separately as well.
 
 # How to run the client
 Clone the repository and use gradle to build and run it.
@@ -19,7 +20,7 @@ The program uses command line arguments
  ````
  ./gradlew run --args="-h='192.168.1.55:55555' -u=testuser -p=solace123 -v=testvpn -publishCount=20000 -publishTopic=a/b"
  ````
- [hello-perf ]$ ./gradlew run --args="-h='192.168.1.55:55555' -u=testuser -p=solace123 -v=testvpn -publishCount=20000 -publishTopic=a/b"
+ [hello-perf ]$ ./gradlew run --args="-h='192.168.1.55:55555' -u=username -p=password -v=testvpn -publishCount=20000 -publishTopic=a/b"
 
 > Task :run
 01:31:32 INFO  c.e.s.h.App(23) - App Starting [main]
