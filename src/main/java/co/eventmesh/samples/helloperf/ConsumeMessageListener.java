@@ -48,8 +48,10 @@ public class ConsumeMessageListener implements XMLMessageListener {
         // When the ack mode is set to SUPPORTED_MESSAGE_ACK_CLIENT,
         // guaranteed delivery messages are acknowledged after
         // processing
-        pt2.addMessage(((TextMessage) msg).getText()  + ":" + totalCount);
-        msg.ackMessage();
+    	if (Configuration.getDefaults().get("respond") != null) {
+    		pt2.addMessage(((TextMessage) msg).getText()  + ":" + totalCount);
+    	}
+    	msg.ackMessage();
         doneSignal.countDown();
 
     }

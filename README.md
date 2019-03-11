@@ -7,13 +7,25 @@ The number of messages, message size and the steps in the pipeline (publish/cons
 Clone the repository and use gradle to build and run it.
 The program uses command line arguments
 
-````usage: App
- -h,--hostname <arg>       host FQDN
- -j,--publishTopic <arg>   publishTopic
- -o,--publishCount <arg>   publishCount
- -p,--password <arg>       password
- -u,--username <arg>       username
- -v,--vpn <arg>            vpn name
+````
+usage: App
+ -c,--msgcount <arg>           number of messages to publish per thread
+ -cc,--consume                 enable consume step
+ -cq,--consumequeue <arg>      consume queue
+ -ctc,--consumethreads <arg>   consume thread count
+ -h,--hostname <arg>           hostname of the Solace pubsub+
+ -p,--password <arg>           password
+ -pm,--publishmode <arg>       publish mode: direct or persistent
+ -pp,--publish                 enable publish step
+ -pt,--publishtopic <arg>      publish topic
+ -ptc,--publishthreads <arg>   publish thread count
+ -rm,--respondmode <arg>       respond mode: direct or persistent
+ -rr,--respond                 enable respond step
+ -rt,--respondtopic <arg>      respond topic
+ -rtc,--respondthreads <arg>   publish thread count
+ -u,--username <arg>           username
+ -v,--vpn <arg>                vpn name
+ -z,--messagesize <arg>        message size in bytes
  ````
  
  Sample command line
