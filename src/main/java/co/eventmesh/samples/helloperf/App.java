@@ -26,24 +26,13 @@ public class App {
     	logger.info("App Starting");
     	Configuration.setupDefaults(args);
 
-    	int publishCount = Configuration.PUBLISH_COUNT;
-    	if (Configuration.getDefaults().get("publishcount") != null) {
-    		publishCount = Integer.parseInt(Configuration.getDefaults().get("publishcount"));
-    	}
+    	int msgCount = Integer.parseInt(Configuration.getDefaults().get("msgcount"));
 
-    	int threadCount = Configuration.THREAD_COUNT;    	
-    	if (Configuration.getDefaults().get("threadcount") != null) {
-    		threadCount = Integer.parseInt(Configuration.getDefaults().get("threadcount"));    		
-    	}
-
-    	
-    	
+    	int publishThreads = Integer.parseInt(Configuration.getDefaults().get("publishthreads"));    		
     	
     	CountDownLatch startSignal = new CountDownLatch(1);
     	
-    	
-    	
-        CountDownLatch doneSignal = new CountDownLatch(publishCount*threadCount);
+        CountDownLatch doneSignal = new CountDownLatch(msgCount*publishThreads);
     	
     	
     	if (Configuration.getDefaults().get("consume") != null) {
@@ -71,18 +60,15 @@ public class App {
     
     
     public static void startConsuming(CountDownLatch startSignal, CountDownLatch doneSignal) throws JCSMPException, InterruptedException {
-    	int consThreadCount = Configuration.CONSUMER_THREAD_COUNT;
 
-    	if (Configuration.getDefaults().get("consthreadcount") != null) {
-    		consThreadCount = Integer.parseInt(Configuration.getDefaults().get("consthreadcount"));    		
-    	}
+    	int consThreadCount = Integer.parseInt(Configuration.getDefaults().get("consumethreads"));    		
 
-    	String consumequeuename = Configuration.getDefaults().get("consumequeuename");
-    	String publishouttopic = Configuration.getDefaults().get("publishouttopic");
+    	String consumequeue = Configuration.getDefaults().get("consumequeue");
+    	String respondtopic = Configuration.getDefaults().get("respondtopic");
 
     	
     	for (int i = 0; i < consThreadCount; i++) {
-    		startConsumingThread(startSignal, doneSignal, i, consumequeuename, publishouttopic  );
+    		startConsumingThread(startSignal, doneSignal, i, consumequeue, respondtopic  );
     	}
     	
     }
@@ -97,17 +83,9 @@ public class App {
     }
     
     public static void startPublishing(CountDownLatch startSignal, CountDownLatch doneSignal) throws JCSMPException {
-    	int threadCount = Configuration.THREAD_COUNT;
-    	int messagesize = Configuration.MESSAGE_SIZE;
     	
-    	if (Configuration.getDefaults().get("threadcount") != null) {
-    		threadCount = Integer.parseInt(Configuration.getDefaults().get("threadcount"));    		
-    	}
-    	
-
-    	if (Configuration.getDefaults().get("messagesize") != null) {
-    		messagesize = Integer.parseInt(Configuration.getDefaults().get("messagesize"));    		
-    	}
+    	int threadCount = Integer.parseInt(Configuration.getDefaults().get("publishthreads"));    		    	
+    	int messagesize = Integer.parseInt(Configuration.getDefaults().get("messagesize"));    		
 
     	for (int i = 0; i < threadCount; i++) {
 
@@ -120,14 +98,12 @@ public class App {
     
     public static void startPublishingThread(CountDownLatch startSignal, CountDownLatch doneSignal,
     		int threadNo, int messageSize) throws JCSMPException {
-    	int repeatCount = Configuration.PUBLISH_COUNT;
-    	if (Configuration.getDefaults().get("publishcount") != null) {
-    		repeatCount = Integer.parseInt(Configuration.getDefaults().get("publishcount"));
-    	}
+    	int repeatCount = Integer.parseInt(Configuration.getDefaults().get("msgcount"));
     	String publishTopic = Configuration.getDefaults().get("publishtopic");
+    	String publishmode = Configuration.getDefaults().get("publishmode");
     	String messageStr = createString(messageSize);
 
-    	PublishThread publishThread = new PublishThread(publishTopic, repeatCount, messageStr);
+    	PublishThread publishThread = new PublishThread(publishTopic, repeatCount, messageStr, publishmode);
     	PublishEventHandler handler = new PublishEventHandler();
     	XMLMessageProducer prod = SolacePublisherFactory.getProducer(handler);
     	publishThread.setProducerListener(prod, handler);
@@ -137,13 +113,14 @@ public class App {
 
     
     public static void startConsumingThread(CountDownLatch startSignal, CountDownLatch doneSignal,
-    		int threadNo, String queueName, String publishTopic) throws JCSMPException, InterruptedException {
-    	ConsumeThread consumeThread = new ConsumeThread(startSignal, doneSignal,
-    			queueName, publishTopic);
+    		int threadNo, String queueName, String respondtopic) throws JCSMPException, InterruptedException {
+    	logger.info("startConsuming THread " + queueName + " " + respondtopic) ;
+    	String respondmode = Configuration.getDefaults().get("respondmode");
+
+    	ConsumeThread consumeThread = new ConsumeThread(queueName);
     	
-    	ConsumeMessageListener handler = new ConsumeMessageListener(threadNo, doneSignal);    	
+    	ConsumeMessageListener handler = new ConsumeMessageListener(threadNo, doneSignal, respondtopic, respondmode);    	
     	consumeThread.setConsumerListener(handler);
-//    	new Thread(consumeThread, "consume-thread-" + threadNo).start();    
 
     }
 

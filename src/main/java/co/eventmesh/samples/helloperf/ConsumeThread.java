@@ -1,7 +1,5 @@
 package co.eventmesh.samples.helloperf;
 
-import java.util.concurrent.CountDownLatch;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,39 +11,20 @@ import com.solacesystems.jcsmp.JCSMPException;
 import com.solacesystems.jcsmp.JCSMPFactory;
 import com.solacesystems.jcsmp.JCSMPProperties;
 import com.solacesystems.jcsmp.JCSMPSession;
-import com.solacesystems.jcsmp.JCSMPStreamingPublishEventHandler;
 import com.solacesystems.jcsmp.Queue;
-import com.solacesystems.jcsmp.TextMessage;
-import com.solacesystems.jcsmp.Topic;
-import com.solacesystems.jcsmp.XMLMessageProducer;
 
 public class ConsumeThread {
 	static private Logger logger = LoggerFactory.getLogger(ConsumeThread.class);
 	
 	private String queueName;
-	private String publishTopicName;
-	
-	
+		
     private String messageText;
     private int repeatCount = 0;
-    private XMLMessageProducer prod = null;
-	private JCSMPStreamingPublishEventHandler handler;
-	private TextMessage msg;
-	private Boolean semaphore = true;
 
-	private Topic topic;
-
-	private String topicName;
-
-	private CountDownLatch startSignal;
-	private CountDownLatch doneSignal;
     
-    public ConsumeThread(CountDownLatch startSignal, CountDownLatch doneSignal,
-    		String queueName, String publishTopicName){
-    	this.startSignal = startSignal;
-    	this.doneSignal = doneSignal;
+    public ConsumeThread(
+    		String queueName){
     	this.queueName = queueName;
-        this.publishTopicName= publishTopicName;
     }
     
      

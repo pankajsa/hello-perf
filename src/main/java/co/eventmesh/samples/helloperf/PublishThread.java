@@ -26,12 +26,14 @@ public class PublishThread implements Runnable {
 	private Topic topic;
 
 	private String topicName;
+	private DeliveryMode deliveryMode = DeliveryMode.DIRECT;
     
-    public PublishThread(String topicName, int repeatCount, String messageText){
+    public PublishThread(String topicName, int repeatCount, String messageText, String publishmode){
     	this.topicName = topicName;
         this.repeatCount= repeatCount;
         this.messageText = messageText;
-    	this.topic = JCSMPFactory.onlyInstance().createTopic(topicName);
+        deliveryMode = "persistent".equals(publishmode) ? DeliveryMode.PERSISTENT:DeliveryMode.DIRECT;
+        this.topic = JCSMPFactory.onlyInstance().createTopic(topicName);
     }
     
     public void setProducerListener(XMLMessageProducer prod, JCSMPStreamingPublishEventHandler handler) {
@@ -44,7 +46,8 @@ public class PublishThread implements Runnable {
     private void sendMessage() throws JCSMPException {
     	msg.reset();
         msg.setText(this.messageText);
-        msg.setDeliveryMode(DeliveryMode.PERSISTENT);
+        msg.setDeliveryMode(deliveryMode);
+        
         prod.send(msg, topic);
     }
 

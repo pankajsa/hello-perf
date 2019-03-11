@@ -3,7 +3,10 @@
  */
 package co.eventmesh.samples.helloperf;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -21,10 +24,15 @@ public class Configuration {
 	private static Options options = optionsBuilder();
 	private static HashMap<String, String> hmap = new HashMap<String,String>();
 	
-	public static final int PUBLISH_COUNT = 1;
-	public static final int THREAD_COUNT = 1;
-	public static final int MESSAGE_SIZE = 1;
-	public static final int CONSUMER_THREAD_COUNT = 2;
+	public static final int MESSAGE_SIZE = 1024;
+	public static final int PUBLISH_THREAD_COUNT = 1;
+	public static final int CONSUME_THREAD_COUNT = 1;
+	public static final int RESPOND_THREAD_COUNT = 1;
+	public static final String MODE = "direct";
+
+//	public static final int PUBLISH_COUNT = 1;
+//	public static final int THREAD_COUNT = 1;
+//	public static final int CONSUMER_THREAD_COUNT = 2;
 	
 
     public static void Usage() {
@@ -38,148 +46,184 @@ public class Configuration {
     
     private static Options optionsBuilder() {
     	Options options = new Options();
-       	
+
     	options.addOption(Option.builder("h")
-   		     .required(false)
-   		     .desc("host FQDN")
-   		     .longOpt("hostname")
-   		     .numberOfArgs(1)
-   		     .build());
-    	options.addOption(Option.builder("u")
-      		     .required(false)
-      		     .desc("username")
-      		     .longOpt("username")
-      		     .numberOfArgs(1)
-      		     .build());
-    	options.addOption(Option.builder("p")
-      		     .required(false)
-      		     .desc("password")
-      		     .longOpt("password")
-      		     .numberOfArgs(1)
-      		     .build());
-    	options.addOption(Option.builder("o")
-     		     .required(true)
-     		     .desc("publishcount")
-     		     .longOpt("publishcount")
-     		     .numberOfArgs(1)
-     		     .build());
+    			.required(true)
+    			.desc("hostname of the Solace pubsub+")
+    			.longOpt("hostname")
+    			.numberOfArgs(1)
+    			.build()); 	
     	options.addOption(Option.builder("v")
-     		     .required(true)
-     		     .desc("vpn name")
-     		     .longOpt("vpn")
-     		     .numberOfArgs(1)
-     		     .build());
-    	options.addOption(Option.builder("j")
-    		     .required(true)
-    		     .desc("publish topic")
-    		     .longOpt("publishtopic")
-    		     .numberOfArgs(1)
-    		     .build());
-    	options.addOption(Option.builder("t")
-      		     .required(false)
-      		     .desc("thread count")
-      		     .longOpt("threadcount")
-      		     .numberOfArgs(1)
-      		     .build());
+    			.required(true)
+    			.desc("vpn name")
+    			.longOpt("vpn")
+    			.numberOfArgs(1)
+    			.build());
+    	options.addOption(Option.builder("u")
+    			.required(false)
+    			.desc("username")
+    			.longOpt("username")
+    			.numberOfArgs(1)
+    			.build());
+    	options.addOption(Option.builder("p")
+    			.required(false)
+    			.desc("password")
+    			.longOpt("password")
+    			.numberOfArgs(1)
+    			.build());
+
+
+    	options.addOption(Option.builder("c")
+    			.required(true)
+    			.desc("number of messages to publish per thread")
+    			.longOpt("msgcount")
+    			.numberOfArgs(1)
+    			.build());
     	options.addOption(Option.builder("z")
-     		     .required(false)
-     		     .desc("message size")
-     		     .longOpt("messagesize")
-     		     .numberOfArgs(1)
-     		     .build());
-    	options.addOption(Option.builder("h")
-      		     .required(false)
-      		     .desc("host FQDN")
-      		     .longOpt("hostname")
-      		     .numberOfArgs(1)
-      		     .build());
-    	options.addOption(Option.builder("i")
-     		     .required(true)
-     		     .desc("Consumer Thread Count")
-     		     .longOpt("consthreadcount")
-     		     .numberOfArgs(1)
-     		     .build());
-    	options.addOption(Option.builder("aa")
-     		     .required(true)
-     		     .desc("consumequeuename")
-     		     .longOpt("consumequeuename")
-     		     .numberOfArgs(1)
-     		     .build());
-    	options.addOption(Option.builder("bb")
-    		     .required(true)
-    		     .desc("publishouttopic")
-    		     .longOpt("publishouttopic")
-    		     .numberOfArgs(1)
-    		     .build());
-    	options.addOption(Option.builder("cc")
-   		     .required(false)
-   		     .desc("consume")
-   		     .longOpt("consume")
-   		     .numberOfArgs(0)
-   		     .build());
+    			.required(false)
+    			.desc("message size in bytes")
+    			.longOpt("messagesize")
+    			.numberOfArgs(1)
+    			.build());
+
+
+    	options.addOption(Option.builder("pt")
+    			.required(true)
+    			.desc("publish topic")
+    			.longOpt("publishtopic")
+    			.numberOfArgs(1)
+    			.build());
+    	options.addOption(Option.builder("cq")
+    			.required(true)
+    			.desc("consume queue")
+    			.longOpt("consumequeue")
+    			.numberOfArgs(1)
+    			.build());
+    	options.addOption(Option.builder("rt")
+    			.required(true)
+    			.desc("respond topic")
+    			.longOpt("respondtopic")
+    			.numberOfArgs(1)
+    			.build());
+
+
+    	options.addOption(Option.builder("pm")
+    			.required(false)
+    			.desc("publish mode: direct or persistent")
+    			.longOpt("publishmode")
+    			.numberOfArgs(1)
+    			.build());
+    	options.addOption(Option.builder("rm")
+    			.required(false)
+    			.desc("respond mode: direct or persistent")
+    			.longOpt("respondmode")
+    			.numberOfArgs(1)
+    			.build());
+
+    	
+    	
+    	options.addOption(Option.builder("ptc")
+    			.required(false)
+    			.desc("publish thread count")
+    			.longOpt("publishthreads")
+    			.numberOfArgs(1)
+    			.build());
+    	options.addOption(Option.builder("ctc")
+    			.required(false)
+    			.desc("consume thread count")
+    			.longOpt("consumethreads")
+    			.numberOfArgs(1)
+    			.build());
+    	options.addOption(Option.builder("rtc")
+    			.required(false)
+    			.desc("publish thread count")
+				.longOpt("respondthreads")
+    			.numberOfArgs(1)
+    			.build());
+
+
     	options.addOption(Option.builder("pp")
-      		     .required(false)
-      		     .desc("publish")
-      		     .longOpt("publish")
-      		     .numberOfArgs(0)
-      		     .build());
+    			.required(false)
+    			.desc("enable publish step")
+    			.longOpt("publish")
+    			.numberOfArgs(0)
+    			.build());
+    	options.addOption(Option.builder("cc")
+    			.required(false)
+    			.desc("enable consume step")
+    			.longOpt("consume")
+    			.numberOfArgs(0)
+    			.build());
+    	options.addOption(Option.builder("rr")
+    			.required(false)
+    			.desc("enable respond step")
+    			.longOpt("respond")
+    			.numberOfArgs(0)
+    			.build());
 
 
-    	
-    	
-    	
-//    	options.addOption(Option.builder("w")
-//     		     .required(true)
-//     		     .desc("publish ack window")
-//     		     .longOpt("pubackwindow")
-//     		     .numberOfArgs(1)
-//     		     .build());
-//    	options.addOption(Option.builder("v")
-//     		     .required(false)
-//     		     .desc("verbose")
-//     		     .longOpt("verbose")
-//     		     .numberOfArgs(0)
-//     		     .build());
     	return(options);
     	
     }
     
     private static void updateArgument(String key, CommandLine cmd) {
     	String val = null;
+
     	if (cmd.hasOption(key)) {
     		val = cmd.getOptionValue(key) != null ? cmd.getOptionValue(key):"1";
+    	}
+    	
+    	if (val == null) {
+        	if (key == "username")
+        		val = "default";
+        	else if (key == "messagesize")
+        		val = Integer.toString(MESSAGE_SIZE);
+        	else if (key == "publishthreads")
+        		val = Integer.toString(PUBLISH_THREAD_COUNT);
+        	else if (key == "consumethreads")
+        		val = Integer.toString(CONSUME_THREAD_COUNT);
+        	else if (key == "respondthreads")
+        		val = Integer.toString(RESPOND_THREAD_COUNT);
+        	else if (key == "messagesize")
+        		val = Integer.toString(MESSAGE_SIZE);
+        	else if (key == "publishmode")
+        		val = MODE;
+        	else if (key == "respondmode")
+        		val = MODE;
+        	
+
     	}
     	hmap.put(key, val);
     }
     
     public static HashMap<String, String> setupDefaults(String[] args) { 
-//    	hmap.put("hostname", "localhost");
-//    	hmap.put("port", "55555");
     	
     	CommandLineParser parser = new DefaultParser();
     	CommandLine cmd;
 		try {
 			cmd = parser.parse( options, args);
-	    	updateArgument("publishcount", cmd);
-	    	updateArgument("hostname", cmd);
-	    	updateArgument("publishtopic", cmd);
-	    	
-	    	updateArgument("username", cmd);
-	    	updateArgument("password", cmd);
-	    	updateArgument("vpn", cmd);
-	    	updateArgument("port", cmd);
-
-	    	updateArgument("threadcount", cmd);
-	    	updateArgument("messagesize", cmd);
-
-	    	updateArgument("consumequeuename", cmd);
-	    	updateArgument("publishouttopic", cmd);
-	    	updateArgument("consthreadcount", cmd);
-	    	
-	    	updateArgument("consume", cmd);
-	    	updateArgument("publish", cmd);
-
-	    	
+			
+			List<String> array = new ArrayList<>(Arrays.asList(
+					"hostname"
+					, "vpn"
+					, "username"
+					, "password"
+					, "msgcount"
+					, "messagesize"
+					, "publishtopic"
+					, "consumequeue"
+					, "respondtopic"
+					, "publishthreads"
+					, "consumethreads"
+					, "respondthreads"
+					, "publish"
+					, "consume"
+					, "respond"
+					, "publishmode"
+					, "respondmode"
+					));
+			array.forEach(s -> updateArgument(s, cmd));
+			
 	    	return(hmap);
 		} catch (ParseException e) {
     		logger.error("Error in command line arguments. " + e.getMessage());

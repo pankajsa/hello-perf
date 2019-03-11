@@ -23,6 +23,7 @@ import com.solacesystems.jcsmp.XMLMessageProducer;
 import com.solacesystems.jcsmp.JCSMPSendMultipleEntry;
 
 public class SolaceFactory{
+	/*
 	static private Logger logger = LoggerFactory.getLogger(SolaceFactory.class);
     private JCSMPSession session = null;
     private XMLMessageProducer prod = null;
@@ -123,7 +124,7 @@ public class SolaceFactory{
 
     }
     
-   /* 
+   
     public void startConsumer() throws JCSMPException {
     	cons = session.getMessageConsumer(new XMLMessageListener() {
             @Override
@@ -150,7 +151,7 @@ public class SolaceFactory{
         // Consume-only session is now hooked up and running!
 
     }
-*/
+
     public void send(String topicName, String text) throws JCSMPException {
     	if (msg == null) {
         	this.msg = JCSMPFactory.onlyInstance().createMessage(TextMessage.class);    		
@@ -204,6 +205,6 @@ public class SolaceFactory{
     	return(properties);
     }
 
-    
+    */
     
 }

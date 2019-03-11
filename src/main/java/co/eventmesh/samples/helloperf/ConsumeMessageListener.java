@@ -18,11 +18,11 @@ public class ConsumeMessageListener implements XMLMessageListener {
 	private CountDownLatch doneSignal;
 	private PublishThread2 pt2;
 	
-	ConsumeMessageListener(int threadNo, CountDownLatch doneSignal){
+	ConsumeMessageListener(int threadNo, CountDownLatch doneSignal, String publishTopic, String respondmode){
 		super();
 		this.threadNo = threadNo;
 		this.doneSignal = doneSignal;
-		pt2 = new PublishThread2("a/d");
+		pt2 = new PublishThread2(publishTopic, respondmode);
     	new Thread(pt2, "publish2-thread-").start();    	
 		
 	}
@@ -48,7 +48,7 @@ public class ConsumeMessageListener implements XMLMessageListener {
         // When the ack mode is set to SUPPORTED_MESSAGE_ACK_CLIENT,
         // guaranteed delivery messages are acknowledged after
         // processing
-        pt2.addMessage("BBBBBB"  + totalCount);
+        pt2.addMessage(((TextMessage) msg).getText()  + ":" + totalCount);
         msg.ackMessage();
         doneSignal.countDown();
 

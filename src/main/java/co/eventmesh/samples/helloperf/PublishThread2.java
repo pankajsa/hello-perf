@@ -33,23 +33,23 @@ public class PublishThread2 implements Runnable {
 	private Topic topic;
 
 	private String topicName;
-    
-    public PublishThread2(String topicName){
+	private DeliveryMode deliveryMode = DeliveryMode.DIRECT;
+
+    public PublishThread2(String topicName, String publishmode){
     	this.topicName = topicName;
     	this.topic = JCSMPFactory.onlyInstance().createTopic(topicName);
     	
+        deliveryMode = "persistent".equals(publishmode) ? DeliveryMode.PERSISTENT:DeliveryMode.DIRECT;
+
 
     	int publishcount = 1;
     	int consthreadcount = 1;
     	int threadcount = 1;
     	
-    	if (Configuration.getDefaults().get("publishcount") != null) 
-    		publishcount = Integer.parseInt(Configuration.getDefaults().get("publishcount"));
-    	if (Configuration.getDefaults().get("consthreadcount") != null) 
-    		consthreadcount = Integer.parseInt(Configuration.getDefaults().get("consthreadcount"));
-    	if (Configuration.getDefaults().get("threadcount") != null) 
-    		threadcount = Integer.parseInt(Configuration.getDefaults().get("threadcount"));
-    	repeatCount = publishcount * threadcount / consthreadcount;
+    	int msgcount = Integer.parseInt(Configuration.getDefaults().get("msgcount"));
+    	int publishthreads = Integer.parseInt(Configuration.getDefaults().get("publishthreads"));
+    	int consumethreads = Integer.parseInt(Configuration.getDefaults().get("consumethreads"));
+    	repeatCount = publishthreads * msgcount / consumethreads;
     	logger.debug("Loops: " +  repeatCount);
     	
 //    	int repeatCount = Configuration.PUBLISH_COUNT;
@@ -100,9 +100,8 @@ public class PublishThread2 implements Runnable {
     	
     	
         try {
-//        	logger.info("MQueue = " + mqueue.size());
 			msg.setText(mqueue.take());
-	        msg.setDeliveryMode(DeliveryMode.DIRECT);
+	        msg.setDeliveryMode(this.deliveryMode);
 	        prod.send(msg, topic);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -142,10 +141,6 @@ public class PublishThread2 implements Runnable {
 //    	logger.info(hmap.toString());
 
     	JCSMPProperties properties = new JCSMPProperties();
-//    	properties.setProperty(JCSMPProperties.HOST, "localhost");
-//    	properties.setProperty(JCSMPProperties.USERNAME, "admin");
-//    	properties.setProperty(JCSMPProperties.PASSWORD, "admin");
-//    	properties.setProperty(JCSMPProperties.VPN_NAME, "default");
 
     	properties.setProperty(JCSMPProperties.HOST, hmap.get("hostname"));
     	properties.setProperty(JCSMPProperties.USERNAME, hmap.get("username"));
