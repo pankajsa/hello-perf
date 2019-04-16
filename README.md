@@ -30,9 +30,13 @@ usage: App
  
  Sample command line
  ````
- ./gradlew run --args="-h='192.168.1.55:55555' -u=testuser -p=solace123 -v=testvpn -publishCount=20000 -publishTopic=a/b"
+ Publishing mode:
+./gradlew run --args="-h='localhost:55555' -u=default -p=default -v=VPN2 -msgcount 10000 -pt a/b -cq a/b -rt a/b -pm persistent -pp"
+
+Consumer Mode:
+./gradlew run --args="-h='localhost:55555' -u=default -p=default -v=VPN2 -msgcount 10 -pt a/b -cq Test -rt a/b -cc"
+
  ````
- [hello-perf ]$ ./gradlew run --args="-h='192.168.1.55:55555' -u=username -p=password -v=testvpn -publishCount=20000 -publishTopic=a/b"
 
 > Task :run
 01:31:32 INFO  c.e.s.h.App(23) - App Starting [main]
